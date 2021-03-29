@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reparador de enlaces</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="./dist/main.js" defer></script>
+</head>
+<style>
+    .visualizer h1{
+        font-size: 24pt;
+    }
+
+    .code, .preview{
+        display: none;
+    }
+
+    .active{
+        display: block;
+    }
+</style>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col s12">
+                <h3>Reparador de archivos MarkDown</h3>
+                <hr>
+                <br>
+                <a id="new-button" class="blue darken-4 waves-effect waves-light btn"><i class="material-icons left">add_box</i>Nuevo</a>
+                <a id="toggle-button" class="blue darken-4 waves-effect waves-light btn" data-toggle="preview"><i class="material-icons left">visibility</i>Previsualizar</a>
+                <br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s12">
+                <label>
+                    <input type="checkbox" id="listas" class="filled-in" />
+                    <span>Sustituir listas por títulos</span>
+                </label>
+                &#160;&#160;
+                <label>
+                    <input type="checkbox" id="limpiar-obs" class="filled-in" />
+                    <span>Limpiar OBS</span>
+                </label>
+            </div>  
+        </div>
+        <div class="row visualizer">
+            <form class="col s6">
+            <div class="row">
+                <div class="input-field col s12 code active">
+                <textarea id="entrada" class="materialize-textarea"></textarea>
+                <label for="entrada">Introduce el texto a modificar</label>
+                </div>
+                <div class="col s12 preview">
+                    <label for="">Texto fuente:</label>
+                    <div id="source-preview">
+
+                    </div>
+                </div>
+            </div>
+            </form>
+            <form class="col s6">
+                <div class="row">
+                <div class="input-field col s12 code active">
+                    <textarea id="salida" class="materialize-textarea"></textarea>
+                    <label for="salida">Resultado:</label>
+                </div>
+                <div class="col s12 preview">
+                    <label for="">Resultado:</label>
+                    <div id="result-preview">
+
+                    </div>
+                </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+
+    </script>
+</body>
+</html>
