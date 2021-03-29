@@ -25,11 +25,11 @@
     <div class="container">
         <div class="row">
             <div class="col s12">
-                <h3>Reparador de enlaces</h3>
+                <h3>Reparador de archivos MarkDown</h3>
                 <hr>
                 <br>
-                <a id="new-button" class="blue darken-4 waves-effect waves-light btn" onclick="newRepair(event)"><i class="material-icons left">add_box</i>Nuevo</a>
-                <a id="toggle-button" class="blue darken-4 waves-effect waves-light btn" data-toggle="preview" onclick="toggleView(this)"><i class="material-icons left">visibility</i>Previsualizar</a>
+                <a id="new-button" class="blue darken-4 waves-effect waves-light btn"><i class="material-icons left">add_box</i>Nuevo</a>
+                <a id="toggle-button" class="blue darken-4 waves-effect waves-light btn" data-toggle="preview"><i class="material-icons left">visibility</i>Previsualizar</a>
                 <br>
             </div>
         </div>
@@ -50,7 +50,7 @@
             <form class="col s6">
             <div class="row">
                 <div class="input-field col s12 code active">
-                <textarea id="entrada" onkeyup="fixAll(this.value)" class="materialize-textarea"></textarea>
+                <textarea id="entrada" class="materialize-textarea"></textarea>
                 <label for="entrada">Introduce el texto a modificar</label>
                 </div>
                 <div class="col s12 preview">
