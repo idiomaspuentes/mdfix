@@ -2,7 +2,16 @@ import marked from 'marked';
 import M from 'materialize-css';
 import './style.css';
 
-function newRepair(e){
+let newButton = document.getElementById('new-button')
+    newButton.addEventListener('click', function () { newRepair(); })
+
+let toggleButton = document.getElementById('toggle-button')
+    toggleButton.addEventListener('click', function () { toggleView(toggleButton); })
+
+let entradaBox = document.getElementById('entrada')
+    entradaBox.addEventListener('keyup', function () { fixAll(entradaBox.value); })
+
+function newRepair(){
 
     let button = document.getElementById('toggle-button')
     
