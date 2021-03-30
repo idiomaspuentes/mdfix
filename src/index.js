@@ -148,12 +148,12 @@ function fixQuotes(target){
                 p1 = p1.replace(/'([^"']+)'/gm, (match, p) => {
                     return `‘${p}’`
                 })
-                console.log(`“${p1}”`)
+                //console.log(`“${p1}”`)
                 return `“${p1}”`
             }
             
             if(p2){
-                console.log(`‘${p2}’`)
+                //console.log(`‘${p2}’`)
                 return `‘${p2}’`
             }
         })
@@ -193,7 +193,7 @@ function refactorList(target){
 function cleanOBS(target){
     let pattern = /^(?:## .+ ##\n+[^#]+)*(?:#* *(?:Translation Notes|Notas de traducci[oó]n).+#*){1}\n+([^#]+)/gim
     let fixed = target.replace(pattern, (match, p) => {
-        console.log(p)
+        //console.log(p)
         return p
     });
     return fixed
