@@ -5,46 +5,79 @@ import colors from 'colors'
 
 const path = `./src/rep/es-419_obs-tn/content/`
 
+async function fixFiles(path){
 
-for (let index = 25; index <= 50; index++) {
-    const dirname = path + index;
+    for (let index = 25; index <= 50; index++) {
+        const dirname = path + index;
 
-    fs.readdir(dirname, function(err, filenames) {
-        
-        if (err) {
-        console.log(err)
-        return;
-        }
-
-        console.log(dirname)
-        
-        filenames.forEach(function(filename) {
-
-            //console.log(colors.green(filename))
+        fs.readdir(dirname, function(err, filenames) {
             
-            const filePath = dirname + '/' + filename
+            if (err) {
+            console.log(err)
+            return;
+            }
 
-            fs.readFile(filePath, 'utf-8', function(err, content) {
+            //console.log(dirname)
+            
+            filenames.forEach(function(filename) {
 
-                if (err) {
-                    console.log('%c',err,)
-                    return
-                }
+                //console.log(colors.green(filename))
                 
-                fixAll(content).then( (fixed) => {
-                    console.log('\n',colors.green(filePath),'\n')
-                    console.log(fixed,'\n')
+                const filePath = dirname + '/' + filename
+
+                fs.readFile(filePath, 'utf-8', function(err, content) {
+
+                    if (err) {
+                        console.error(err)
+                        return
+                    }
+                    
+                    fixAll(content).then( (fixed) => {
+
+                        fs.writeFile(filePath, fixed.fixed, 'utf-8', function(err, content) {
+
+                            if (err) {
+                                console.error(err)
+                                return
+                            }
+                        })
+
+                        if(fixed.warnings){ 
+
+                            let today = new Date();
+
+                            let date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+
+                            let time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+
+                            let dateTime = date+' '+time;
+
+                            let warnings = `(${index}/${filename}) ${dateTime} | ${filePath} \n [WARNINGS] \n ${fixed.warnings} \n\n`
+
+                            fs.appendFile('./src/logs/log.txt', warnings, 'utf-8', function(err, content) {
+
+                                if (err) {
+                                    console.error(err)
+                                    return
+                                }
+                            })
+
+                            //console.log(`\n`,colors.green(filePath),`\n`)
+                            //console.log(colors.yellow(date,'[Warnings] \n',fixed.warnings, '\n'))
+                        }
+                    });
 
                 });
 
-            });
+            })
 
-        });
+            
+        })
+    }
 
-        
-    })
 }
 
+fixFiles(path)
 
 // var fs = require('fs');
 
