@@ -126,7 +126,7 @@ function fixLinks(target){
 }
 
 function fixAsterisk(target){
-    let pattern = /(?:(?:\\\*|\*){2}(?: )*([^\n\*\\]+)(?: )*(?:\\\*|\*){2})/gm
+    let pattern = /(?:\\\*|\*){2} *([^ ][^\n\*\\]+[^ ]) *(?:\\\*|\*){2}/gm
     let fixed = target.replace(pattern, (match, p1, p2)=> p1 ? `**${p1}**` : `**${p2}**`)
     return fixed
 }
