@@ -181,6 +181,7 @@ function cleanEdges(target){
 function refactorList(target){
     let pattern = /^(?: *\* *_* *([^_\*\n]*[^-])(?:[\s_-]+)+\s+)(?!\*|#)(?:([^#\n]+)) *$/gm
     let fixed = target.replace(pattern, (match, p1, p2)=>{
+        console.log({match,p1,p2})
         if(p1 && p2)
             return `\n# ${cleanEdges(p1)}\n\n${cleanEdges(p2)}\n`
 
