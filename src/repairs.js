@@ -104,15 +104,13 @@ function cleanOBS(target) {
 export async function fixAll(target) {
 
     let fixed = await target;
-
-
-    fixed = await cleanOBS(fixed);
-    fixed = await refactorList(fixed);
-    fixed = await fixLinks(fixed);
-    fixed = await fixTitles(fixed);
-    fixed = await fixQuotes(fixed);
-    fixed = await fixAsterisk(fixed);
-    fixed = await cleanEdges(fixed);
+        fixed = await cleanOBS(fixed);
+        fixed = await refactorList(fixed);
+        fixed = await fixLinks(fixed);
+        fixed = await fixTitles(fixed);
+        fixed = await fixQuotes(fixed);
+        fixed = await fixAsterisk(fixed);
+        fixed = await cleanEdges(fixed);
 
     return fixed;
 }
