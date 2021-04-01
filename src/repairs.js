@@ -71,6 +71,8 @@ async function fixQuotes(target) {
     return fixed;
 }
 
+function showSubtitles()
+
 async function fixTitles(target) {
     let pattern = /(?:^(?:\s)*(#+) ?(.+) *)|(?:(?:\s)+(#+) ?(.+) *\s+)/g;
     let fixed = await target.replace(pattern, (match, p1, p2, p3, p4) => {
@@ -111,18 +113,14 @@ async function refactorList(target) {
 
 
 async function fixLists(target) {
-    //^(?: *((?:\*|-|\+) *.+)\n+)(?=\*|-|\+)
-    //^(?: *(\*|-|\+) *(.+)\n+)(?=\*|-|\+)
-    let pattern = /^(?: *((?:\*|-|\+) *.+)\n+)(?=\*|-|\+)/gm
-    console.log(pattern)
+    let pattern = /^(?: *)(\*|-|\+) *(.+) *\n+/gm
+    
     let fixed = await target.replace(pattern, (match, p1, p2)=>{
-        console.log(p1)
-        return `${p1}(**manzana**)\n\n`
+        return `${p1} ${p2}\n\n`
     })
+    console.log(fixed)
     return fixed
 }
-
-
 
 async function cleanOBS(target) {
     let pattern = /^(?:## .+ ##\n+[^#]+)*(?:#* *(?:Translation Notes|Notas de traducci[oó]n).+#*){1}\n+([^#]+)/gim;
@@ -172,7 +170,6 @@ export async function fixAll(target) {
 
         let fixed = await fixLists(target)
         .then( response => fixQuotes(response) )
-        //.then( response => fixAsterisk(response) )
         .then( response => fixTitles(response) )
         .then( response => fixStarEnclosures(response) )
         .then( response => fixUnderScoreEnclosures(response) )
