@@ -4,7 +4,7 @@ import colors from 'colors'
 
 const repPath = `./src/rep/`
 
-const path = repPath + `es-419_obs-tn/content/`
+const path = repPath + `es-419_tw/bible/`
 
 async function fixFiles(path){
 
@@ -16,62 +16,81 @@ async function fixFiles(path){
             console.log(err)
             return;
         }
-
-        
-        
+     
         filenames.forEach(function(filename) {
 
             //console.log(colors.green(filename))
             
-            const filePath = dirname + '/' + filename
+            const dirPath = dirname + '/' + filename
 
-            let stats = fs.statSync(path)
+            let stats = fs.statSync(dirPath)
 
-            if(stats.isDirectory())
+            if(stats.isDirectory()){
 
-            fs.readFile(filePath, 'utf-8', function(err, content) {
+                fs.readdir(dirPath, function(err, filenames) {
+                    
+                    if (err) {
+                    console.log(err)
+                    return;
+                    }
 
-                if (err) {
-                    console.error(err)
-                    return
-                }
-                
-                fixAll(content).then( (fixed) => {
+                    //console.log(dirname)
+                    
+                    filenames.forEach(function(filename) {
 
-                    fs.writeFile(filePath, fixed.fixed, 'utf-8', function(err, content) {
+                        //console.log(colors.green(filename))
+                        
+                        const filePath = dirPath + '/' + filename
 
-                        if (err) {
-                            console.error(err)
-                            return
-                        }
-                    })
-
-                    if(fixed.warnings){ 
-
-                        let today = new Date();
-
-                        let date = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
-
-                        let time = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
-
-                        let dateTime = date+' '+time;
-
-                        let warnings = `(${index}/${filename}) ${dateTime} | ${filePath} \n [WARNINGS] \n ${fixed.warnings} \n\n`
-
-                        fs.appendFile('./src/logs/log.txt', warnings, 'utf-8', function(err, content) {
+                        fs.readFile(filePath, 'utf-8', function(err, content) {
 
                             if (err) {
                                 console.error(err)
                                 return
                             }
+                            
+                            fixAll(content).then( (fixed) => {
+
+                                fs.writeFile(filePath, fixed.fixed, 'utf-8', function(err, content) {
+
+                                    if (err) {
+                                        console.error(err)
+                                        return
+                                    }
+                                })
+
+                                if(fixed.warnings){ 
+
+                                    let today = new Date();
+
+                                    let date = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+
+                                    let time = `${today.getHours()}:${today.getMinutes()}:${today.getSeconds()}`;
+
+                                    let dateTime = date+' '+time;
+
+                                    let warnings = `(${filename}) ${dateTime} | ${filePath} \n [WARNINGS] \n ${fixed.warnings} \n\n`
+
+                                    fs.appendFile('./src/logs/log.txt', warnings, 'utf-8', function(err, content) {
+
+                                        if (err) {
+                                            console.error(err)
+                                            return
+                                        }
+                                    })
+
+                                    //console.log(`\n`,colors.green(filePath),`\n`)
+                                    //console.log(colors.yellow(date,'[Warnings] \n',fixed.warnings, '\n'))
+                                }
+                            })
+
                         })
 
-                        //console.log(`\n`,colors.green(filePath),`\n`)
-                        //console.log(colors.yellow(date,'[Warnings] \n',fixed.warnings, '\n'))
-                    }
-                });
+                    })
+                    
+                })
 
-            });
+            }
 
         })
 
