@@ -22,6 +22,7 @@ async function fixLinks(target) {
     }));
     return fixed;
 }
+
 async function fixAsterisk(target) {
     let pattern = /(?:\\\*|\*){2} *([^\n\*\\]+[^ ]) *(?:\\\*|\*){2}/gm;
     let fixed = target.replace(pattern, (match, p1) =>`**${p1}**`);
@@ -32,6 +33,7 @@ async function cleanQuotes(target) {
     let fixed = target.replace(pattern, (match, p1, p2) => p1 ? `"` : `'`);
     return fixed;
 }
+
 async function fixQuotes(target) {
 
     let pattern = /"([^"]+)"|'([^"']+)'/gm;
@@ -55,11 +57,12 @@ async function fixQuotes(target) {
 
     return fixed;
 }
+
 async function fixTitles(target) {
-    let pattern = /(?:^\s+)?#+(.+)\s+/gm;
+    let pattern = /(?:\s+)?#+ ?(.+)\s+/gm;
     let fixed = await target.replace(pattern, (match, p) => {
         
-        let output = cleanEdges(p)
+        let output = p
 
         return `\n\n# ${output}\n\n`;
     });
@@ -76,22 +79,23 @@ function cleanEdges(target) {
     return fixed;
 }
 async function refactorList(target) {
-    let pattern = /^(?: *\* *_* *([^_\*\n]*[^-])(?:[\s_-]+)+\s+)(?!\*|#)(?:([^#\n]+)) *$/gm;
-    let fixed = target.replace(pattern, (match, p1, p2) => {
-        if (p1 && p2)
+    let pattern = /^(?: *\* *_* *([^_\*\n]*[^-])(?:[\s_-]+)+\s+)(?!\*|#)(?:([^#\n]+))\s*$/gm
+    let fixed = target.replace(pattern, (match, p1, p2)=>{
+        if(!p2) console.log(p1)
+        if(p1 && p2)
             return `\n# ${cleanEdges(p1)}\n\n${cleanEdges(p2)}\n`
         else
-            return p1 ? `\n* ${cleanEdges(p1)}\n\n` : `\n* ${cleanEdges(p2)}\n\n`
-    });
-    return fixed;
+            return null
+            //return p1 ? `\n* ${cleanEdges(p1)}\n\n` : `\n* ${cleanEdges(p2)}\n\n`
+    })
+    return fixed
 }
+
 async function cleanOBS(target) {
     let pattern = /^(?:## .+ ##\n+[^#]+)*(?:#* *(?:Translation Notes|Notas de traducci[oó]n).+#*){1}\n+([^#]+)/gim;
     let fixed = target.replace(pattern, (match, p) => {
-        //console.log(p);
         return p;
     });
-    //console.log('fixed:', fixed);
     return fixed;
 }
 
@@ -134,12 +138,14 @@ async function lint(target){
 export async function fixAll(target) {
 
         let fixed = await cleanOBS(target)
-        .then( response => refactorList(response) )
         .then( response => fixQuotes(response) )
         .then( response => fixAsterisk(response) )
+        .then( response => refactorList(response) )
         .then( response => fixTitles(response) )
         .then( response => fixLinks(response) )
         .then( response => cleanEdges(response) )
+
+        //let fixed = await refactorList(target)
 
 /*         fixed = await refactorList(fixed);
         fixed = await fixLinks(fixed);   
@@ -153,3 +159,4 @@ export async function fixAll(target) {
     //console.log(fixed)
     return {fixed, warnings};
 }
+
