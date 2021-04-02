@@ -1,11 +1,11 @@
 import fs from 'fs'
-import { fixFile } from './fixFile'
+import { fixFile } from './fixFile.js'
 
 const repPath = `./src/rep/`
 
 const filePath = repPath + `es-419_tw/bible/`
 
-async function fixFiles(filePath){
+let fixFiles = filePath => {
 
     let dirname = filePath
 
@@ -15,38 +15,19 @@ async function fixFiles(filePath){
             console.log(err)
             return;
         }
-     
+
         filenames.forEach(function(filename) {
             
             const dirPath = dirname + '/' + filename
-
             let stats = fs.statSync(dirPath)
 
-            if(stats.isDirectory()){
+            if(stats.isDirectory())
+                fixFiles(dirPath)
+            else            
+                fixFile(dirPath)
 
-                fs.readdir(dirPath, function(err, filenames) {
-                    
-                    if (err) {
-                    console.log(err)
-                    return;
-                    }
-                    
-                    filenames.forEach(function(filename) {
-                        
-                        const filePath = dirPath + '/' + filename
-
-                        fixFile(filePath)
-
-                    })
-                    
-                })
-
-            }
-
-        })
-
-        
-    })
-    
+        })        
+    })    
 }
 
+fixFiles(filePath)

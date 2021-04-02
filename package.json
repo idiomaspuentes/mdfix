@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack"
+    "build": "webpack",
+    "fix": "node -e 'require(./src/app).fixFiles()'"
   },
   "author": "",
   "license": "ISC",
