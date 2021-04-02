@@ -1,30 +1,65 @@
 async function cleanLinks(target) {
+    
     let pattern = /(?:\[|(?:\\\[))+(?:rc:|https:|\.*)(?:.+)(?:\]|\\\])*\]/g;
-    let fixed = target.replace(pattern, (match) => {
+    let fixed = await target.replace(pattern, (match) => {
         return match.replace(/\s+/g, '');
     });
-    //console.log(fixed);
+
     return fixed;
 }
 async function fixLinks(target) {
-    let pattern = /(?: ?\([^\)\s]+[ :]?(?:\[|(?:\\\[))+((?:rc:|https:|\.*)?\/\/?(?:[\w-_\.]+\/)*((?:[A-Za-z-_]+(?:\d+)?))(?:\/[0-9]+)?(?:\.\w+)?\/?)\/?(?:\]|\\\])*(?:\)|\])*[^\n \.])|(?:\[|(?:\\\[))+((?:rc:|https:|\.*)?\/\/?(?:[\w-_\.]+\/)*((?:[A-Za-z-_]+(?:\d+)?))(?:\/[0-9]+)?(?:\.\w+)?\/?)(?:\]|(?:\\\]))*/gm;
 
+    //Old pattern: (It used to find the 'see more' text and change it)
+    //let pattern = /(?: ?\([^\)\s]+[ :]?(?:\[|(?:\\\[))+((?:rc:|https:|\.*)?\/\/?(?:[\w-_\.]+\/)*((?:[A-Za-z-_]+(?:\d+)?))(?:\/[0-9]+)?(?:\.\w+)?\/?)\/?(?:\]|\\\])*(?:\)|\])*[^\n \.])|(?:\[|(?:\\\[))+((?:rc:|https:|\.*)?\/\/?(?:[\w-_\.]+\/)*((?:[A-Za-z-_]+(?:\d+)?))(?:\/[0-9]+)?(?:\.\w+)?\/?)(?:\]|(?:\\\]))*/gm;
+   
+    let pattern = '(?:\[|(?:\\\[))+((?:rc:|https:|\.*)?\/\/?(?:[\w\-_\.]+\/)*((?:[A-Za-z-_]+(?:\d+)?))(?:\/[0-9]+)?(?:\.\w+)?\/?)(?:\]|(?:\\\]))+'
+    
     let fixed = await cleanLinks(target)
-    .then( (response) => response.replace(pattern, (match, p1, p2, p3, p4) => {
+    .then( (response) => response.replace(pattern, (match, p1, p2) => {
 
-        let path = p1 ? p1 : p3;
-        let slug = p2 ? p2 : p4;
-
-        let tituloPartes = slug.split('-').map((string) => string[0].toUpperCase() + string.slice(1));
-        let titulo = tituloPartes.join(' ');
-        let enlace = '[' + titulo + ']' + '(' + path + ')';
-        return ` (ver: ${enlace})`;
+        let path = p1
+        let slug = p2
+        console.log(slug)
+        let tituloPartes = slug.split('-').map((string) => string[0].toUpperCase() + string.slice(1))
+        let titulo = tituloPartes.join(' ')
+        let enlace = '[' + titulo + ']' + '(' + path + ')'
+        return enlace
     }));
     return fixed;
 }
 
+async function formatSeeMore(target){
+    
+    let pattern = /(?:([ (]*)(?:(?:Ver[  :]+)|(?:Vea[s :]))[^\[]*)(?=\[)/gim
+    let fixed = await target.replace(pattern, (match, p1) =>`${p1}ver también: `)
+    
+    return fixed
+}
+
+async function tWFixTitles(target,tittle,replace){
+    
+    let pattern = new RegExp(`^(?: *(?:#{2})* *)${tittle}.+`, `gim`);
+    let fixed = target.replace(pattern, (match) =>`## ${replace}`)
+    
+    return fixed
+}
+
+async function fixTranslationWords(target){
+    
+    let fixed = await tWFixTitles(target, 'suger', 'Sugerencias de traducción')
+    .then( response => tWFixTitles(response, 'definic', 'Definición') )
+    .then( response => tWFixTitles(response, 'hechos', 'Definición') )
+    .then( response => tWFixTitles(response, 'refer', 'Referencias bíblicas') )
+    .then( response => tWFixTitles(response, 'bible', 'Referencias bíblicas') )
+    .then( response => tWFixTitles(response, 'datos', 'Datos de esta palabra') )
+    .then( response => tWFixTitles(response, 'ejemplos (de|en) las h', 'Ejemplos de las historias bíblicas') )
+    .then( response => tWFixTitles(response, 'ejemplos (de|en) las h', 'Ejemplos de las historias bíblicas') )    
+    
+    return fixed
+}
+
 async function fixAsterisk(target) {
-    let pattern = /(?:\\\*|\*){2} *([^\n\*\\]+[^ ]) *(?:\\\*|\*){2}/gm;
+     /(?:\\\*|\*){2} *([^\n\*\\]+[^ ]) *(?:\\\*|\*){2}/gm;
     let fixed = target.replace(pattern, (match, p1) =>`**${p1}**`);
     return fixed;
 }
@@ -55,15 +90,14 @@ async function fixQuotes(target) {
     .then( response => response.replace(pattern, (match, p1, p2) => {
 
         if (p1) {
+
             let output = p1.replace(/'([^"']+)'/gm, (match, p) => {
                 return `‘${p}’`;
             });
-            //console.log(`“${p1}”`);
             return `“${output}”`;
         }
-
         if (p2) {
-            //console.log(`‘${p2}’`);
+
             return `‘${p2}’`;
         }
     }));
@@ -71,7 +105,6 @@ async function fixQuotes(target) {
     return fixed;
 }
 
-//(.+)?(Sugerencias.+)
 async function showSubtitles(target){
     let pattern = /(?:^(?:\s)*#{2,} ?(.+)\s+)/gm
     let found = await target.replace(pattern, (match, p) =>{
@@ -111,7 +144,6 @@ async function refactorList(target) {
             return `\n# ${cleanEdges(p1)}\n\n${cleanEdges(p2)}\n`
         else
             return null
-            //return p1 ? `\n* ${cleanEdges(p1)}\n\n` : `\n* ${cleanEdges(p2)}\n\n`
     })
     return fixed
 }
@@ -122,7 +154,7 @@ async function fixLists(target) {
     let pattern = /^(?: *)([*-+]) *(.+) *\s+/gm
     
     let fixed = await target.replace(pattern, (match, p1, p2)=>{
-        return `${p1} ${p2}(**MANZANA**)\n\n`
+        return `${p1} ${p2}\n\n`
     })
     return fixed
 }
@@ -176,27 +208,15 @@ export async function fixAll(target) {
         let fixed = await fixLists(target)
         .then( response => fixQuotes(response) )
         .then( response => fixTitles(response) )
+        .then( response => formatSeeMore(response) )        
         .then( response => fixStarEnclosures(response) )
         .then( response => fixUnderScoreEnclosures(response) )
+        .then( response => fixLinks(response) )
+        .then( response => fixTranslationWords(response) )
         .then( response => cleanEdges(response) )
-        
-        //.then( response => fixLinks(response) )
-        
-        
-        showSubtitles(target)
-
-        //let fixed = await refactorList(target)
-
-/*         fixed = await refactorList(fixed);
-        fixed = await fixLinks(fixed);   
-        fixed = await fixQuotes(fixed);
-        fixed = await fixAsterisk(fixed);
-        fixed = await fixTitles(fixed);
-        fixed = await cleanEdges(fixed); */
       
         let warnings = await lint(fixed);
 
-    //console.log(fixed)
     return {fixed, warnings};
 }
 
