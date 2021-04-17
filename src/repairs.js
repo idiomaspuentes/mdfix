@@ -1,104 +1,4 @@
-import marked from 'marked';
-import M from 'materialize-css';
-import './style.css';
-
-let newButton = document.getElementById('new-button')
-    newButton.addEventListener('click', function () { newRepair(); })
-
-let toggleButton = document.getElementById('toggle-button')
-    toggleButton.addEventListener('click', function () { toggleView(toggleButton); })
-
-let entradaBox = document.getElementById('entrada')
-    entradaBox.addEventListener('keyup', function () { fixAll(entradaBox.value); })
-
-function newRepair(){
-
-    let button = document.getElementById('toggle-button')
-    
-    if(button.getAttribute('data-toggle') == 'code') toggleView(button);
-
-    let resPreview = document.getElementById('result-preview')
-    let srcPreview = document.getElementById('source-preview')
-    resPreview.innerHTML = ''
-    srcPreview.innerHTML = ''
-
-    let salida = document.getElementById('salida')
-    let entrada = document.getElementById('entrada')
-    entrada.value = ''
-    M.textareaAutoResize(entrada)
-    salida.value = ''
-    M.textareaAutoResize(salida)
-    entrada.focus()
-    M.updateTextFields()
-}
-
-function toggleView(button){
-    if(button.getAttribute('data-toggle') == 'preview')
-    {   
-        button.innerHTML = '<i class="material-icons left">code</i>Ver código'
-        button.setAttribute('data-toggle', 'code')
-    }
-    else
-    {
-        button.innerHTML = '<i class="material-icons left">visibility</i>Previsualizar'
-        button.setAttribute('data-toggle', 'preview')
-    }
-
-    let code = document.querySelectorAll(".code")
-        code.forEach((element)=>{
-            element.classList.toggle("active")
-        })
-
-    let preview = document.querySelectorAll(".preview")
-        preview.forEach((element)=>{
-            element.classList.toggle("active")
-        })            
-}
-
-function showResults(input, output){
-    let salida = document.getElementById('salida')
-    let resPreview = document.getElementById('result-preview')
-    let srcPreview = document.getElementById('source-preview')
-    salida.value = output  
-    M.updateTextFields()
-    M.textareaAutoResize(salida)
-    salida.select();
-    document.execCommand('copy')
-    M.toast({html: 'Reultado Copiado'})
-    srcPreview.innerHTML = marked(input)
-    resPreview.innerHTML = marked(output)
-}
-
-async function fixAll(target){         
-
-    let cleanObs = document.getElementById('limpiar-obs').checked
-    let refactorLists = document.getElementById('listas').checked
- 
-
-    let fixed = await cleanTrashCharacters(target)
-        .then( response => { if(cleanObs) return await cleanOBS(response) })
-        .then( response => { if(refactorLists) return await refactorList(response) })
-        .then( response => fixLinks(response) )
-        .then( response => cleanDoubleSpaces(response) )
-        .then( response => formatSeeMore(response) )  
-        .then( response => fixLists(response) ) 
-        .then( response => fixSpaceBeforeLineFeed(response) )
-        .then( response => addPunctuationSpace(response) )
-        .then( response => fixQuotes(response) )
-        //.then( response => fixTranslationWords(response) )
-        .then( response => fixTitles(response) )         
-        .then( response => fixStarEnclosures(response) )
-        .then( response => fixUnderScoreEnclosures(response) )
-        .then( response => cleanEndSpaces(response) )
-        .then( response => fixVersesSpaces(response) )
-        .then( response => cleanEdges(response) )
-        //.then( response => unSubTitle(response) )
-        
-    showResults(target,fixed);
-}
-
-
-// REPAIR FUNCTIONS
+import { lint } from "./linter.js";
 
 async function cleanLinks(target) {
     
@@ -363,3 +263,28 @@ function fixVersesSpaces(target){
     });
     return fixed;
 }
+
+export async function fixAll(target) {
+
+        let fixed = await cleanTrashCharacters(target)
+        .then( response => fixLinks(response) )
+        .then( response => cleanDoubleSpaces(response) )
+        .then( response => formatSeeMore(response) )  
+        .then( response => fixLists(response) ) 
+        .then( response => fixSpaceBeforeLineFeed(response) )
+        .then( response => addPunctuationSpace(response) )
+        .then( response => fixQuotes(response) )
+        //.then( response => fixTranslationWords(response) )
+        .then( response => fixTitles(response) )         
+        .then( response => fixStarEnclosures(response) )
+        .then( response => fixUnderScoreEnclosures(response) )
+        .then( response => cleanEndSpaces(response) )
+        .then( response => fixVersesSpaces(response) )
+        .then( response => cleanEdges(response) )
+        //.then( response => unSubTitle(response) )
+        
+
+
+    return {fixed, warnings};
+}
+
