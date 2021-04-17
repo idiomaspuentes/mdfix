@@ -76,8 +76,8 @@ async function fixAll(target){
  
 
     let fixed = await cleanTrashCharacters(target)
-        .then( response => { if(cleanObs) return cleanOBS(response) })
-        .then( response => { if(refactorLists) return refactorList(response) })
+        // .then( response => { if(cleanObs) return cleanOBS(response) })
+        // .then( response => { if(refactorLists) return refactorList(response) })
         .then( response => fixLinks(response) )
         .then( response => cleanDoubleSpaces(response) )
         .then( response => formatSeeMore(response) )  
