@@ -80,7 +80,7 @@ async function fixAll(target){
         // .then( response => { if(refactorLists) return refactorList(response) })
         .then( response => fixLinks(response) )
         .then( response => cleanDoubleSpaces(response) )
-        .then( response => formatSeeMore(response) )  
+        //.then( response => formatSeeMore(response) )  
         .then( response => fixLists(response) ) 
         .then( response => fixSpaceBeforeLineFeed(response) )
         .then( response => addPunctuationSpace(response) )
